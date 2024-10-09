@@ -18,7 +18,7 @@ const LoginPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
   const [formData, setFormData] = useState<ILoginForm>({
-    email: "",
+    correo_electronico: "",
     password: "",
   });
 
@@ -33,12 +33,14 @@ const LoginPage: React.FC = () => {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log(formData);
-    if (!formData.email || !formData.password) {
+    
+    if (!formData.correo_electronico || !formData.password) {
       toast.error("Por favor completa todos los campos");
       return;
     }
-
+  
+    setLoading(true);
+  
     try {
       const response = await fetch(`${config.API_BASE_URL}/login`, {
         method: "POST",
@@ -51,57 +53,47 @@ const LoginPage: React.FC = () => {
       if (response.ok) {
         const data = await response.json();
         console.log(data);
+  
+        // Guardar token, role, y tenant_database en sessionStorage
+        sessionStorage.setItem("token", data.token);
+        sessionStorage.setItem("role", data.role);
+        sessionStorage.setItem("tenant_database", data.tenant_database);
+  
+        // Guardar en cookies
+        document.cookie = `token=${data.token}; path=/`;
+        document.cookie = `role=${data.role}; path=/`;
+  
+        // Set user data in store
         const newData = {
-          email: data.email,
-          name: data.nombre,
-          role: data.rol,
-        }
-        setUser(newData); // Set user data in the store, the data is email, name and role  
-        router.push("/admin/dashboard");
+          correo_electronico: formData.correo_electronico,
+          name: data.nombre,  // asumiendo que el nombre viene en la respuesta
+          role: data.role,
+        };
+        setUser(newData);
+  
+        // Redirigir 
+       
+          router.push("/admin/dashboard");
+       
+      } else {
+        toast.error("Credenciales incorrectas, intenta nuevamente.");
       }
     } catch (error) {
-      toast.error("Error al iniciar sesion");
+      toast.error("Error al iniciar sesión, por favor intenta nuevamente.");
+    } finally {
+      setLoading(false);
     }
-/* 
-    if (formData.password === "admin" && formData.email === "admin@admin.com") {
-      router.push("/admin/dashboard");
-      setUser({
-        email: formData.email,
-        name: "Admin",
-        role: "admin",
-      });
-      return;
-
-    } else if (formData.password === "user" && formData.email === "user@user.com") {
-      router.push("/admin/dashboard");
-      setUser({
-        email: formData.email,
-        name: "User",
-        role: "user",
-      });
-      return;
-
-    } else if (formData.password === "owner" && formData.email === "owner@owner.com") {
-      router.push("/admin/dashboard");
-      setUser({
-        email: formData.email,
-        name: "Owner",
-        role: "owner",
-      });
-      return;
-    }
-
- */
-  }
+  };
+  
 
   const handleForgotPassword = () => {
     toast.error("Funcionalidad no disponible");
   }
   /* 
   const handleForgotPassword = async () => {
-    const { value: email } = await Swal.fire({
+    const { value: correo_electronico } = await Swal.fire({
       title: 'Recuperar Contraseña',
-      input: 'email',
+      input: 'correo_electronico',
       inputLabel: 'Por favor ingresa tu correo electrónico',
       inputPlaceholder: 'correo@example.com',
       showCancelButton: true,
@@ -111,22 +103,22 @@ const LoginPage: React.FC = () => {
         if (!value) {
           return 'El correo electrónico es obligatorio!';
         }
-        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailPattern.test(value)) {
+        const correo_electronicoPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!correo_electronicoPattern.test(value)) {
           return 'Por favor ingresa un correo electrónico válido';
         }
         return null;
       }
     });
 
-    if (email) {
+    if (correo_electronico) {
       try {
         const response = await fetch(`${config.API_BASE_URL}/forget`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ correo_electronico: email }),
+          body: JSON.stringify({ correo_electronico: correo_electronico }),
         });
 
         if (response.ok) {
@@ -157,11 +149,11 @@ const LoginPage: React.FC = () => {
         </p>
         <form onSubmit={handleSubmit}>
           <FormInput
-            idInput="email"
+            idInput="correo_electronico"
             label="Correo Electronico"
-            name="email"
-            type="email"
-            value={formData.email}
+            name="correo_electronico"
+            type="correo_electronico"
+            value={formData.correo_electronico}
             onChange={handleChange}
             placeholder="ejemplo@inventorypro.com"
           />

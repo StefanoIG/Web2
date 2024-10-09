@@ -9,6 +9,14 @@ import Button from "@/components/shared/Button/Button";
 import { FaCaretRight } from "react-icons/fa";
 
 const Home = () => {
+  //funciones de redirrecionamiento a /planes
+  const redirect = () => {
+   
+        window.location.href = "/planes";
+    
+    
+  };  
+
   return (
     <div>
       <Header />
@@ -17,7 +25,7 @@ const Home = () => {
           <div className="contenido-hero">
             <h2>Optimiza la Gestión de tu Inventario</h2><br />
             <p>Eficiente. Preciso. Confiable.</p><br /><br />
-            <Button variant="outline" label="Empezar" Icon={FaCaretRight} onClick={() => console.log("Hola")} type="button"/>
+            <Button variant="outline" label="Empezar" Icon={FaCaretRight} onClick={redirect} type="button"/>
           </div>
           <div className="imagen-hero">
             <Image

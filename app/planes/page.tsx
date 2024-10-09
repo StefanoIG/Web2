@@ -5,8 +5,8 @@ import Swal from "sweetalert2";
 import { FaMoneyCheckAlt, FaPaypal, FaEye, FaEyeSlash } from 'react-icons/fa';
 import './Register.css';
 import { config } from "@/config/config";
-import Footer from '@/components/landing/footer';
-import Header from "@/components/landing/header";
+import Footer from '@/components/ui/landing/footer';
+import Header from "@/components/ui/landing/header";
 
 const Register: React.FC = () => {
     const [formData, setFormData] = useState({
@@ -17,9 +17,9 @@ const Register: React.FC = () => {
         correo_electronico: '',
         password: '',
         repeatPassword: '',
-        rol: 'owner',
+        rol_id: 2,
         id_plan: '',
-        metodo_pago: '1'
+        metodo_pago: '2'
     });
 
     const [planes, setPlanes] = useState<{ id: string; name: string }[]>([]);
@@ -137,9 +137,15 @@ const Register: React.FC = () => {
                 } else {
                     await Swal.fire({
                         title: 'Éxito',
-                        text: result.message,
+                        text: "Se ha creado su usuario, por favor espere mientras se procesa su suscripción.",
                         icon: 'success',
                         confirmButtonText: 'Ok',
+                        //redirecion despues de 3 segundos al login
+                        timer: 3000,
+                        timerProgressBar: true,
+                        willClose: () => {
+                            window.location.href = "/auth/login";
+                        }
                     });
                 }
             } else {
